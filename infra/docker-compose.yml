@@ -1,0 +1,13 @@
+services:
+  terraform: # Name of container
+    image: hashicorp/terraform:1.6.2 # Name of image to start, a good way to pin the version
+    volumes: # What volumes it will contain
+      - ./setup:/tf/setup
+      - ./deploy:/tf/deploy
+    working_dir: /tf # What directory to work from
+    environment: # It will specify environment variables
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
+      - AWS_DEFAULT_REGION=us-east-1
+      - TF_WORKSPACE=${TF_WORKSPACE} # Define an environment for our deplayment
