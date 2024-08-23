@@ -45,8 +45,8 @@ jobs:
       - name: Terraform lint
         run: | # Allows you to run multiple shell commands
           cd infra/
-          docker compose run --rm terraform -chdir=deploy/ init backend=false
-          docker compose run --rm terraform -chdir=setup/ init backend=false
+          docker compose run --rm terraform -chdir=deploy/ init -backend=false
+          docker compose run --rm terraform -chdir=setup/ init -backend=false
           docker compose run --rm terraform -chdir=setup/ validate
           docker compose run --rm terraform -chdir=setup/ fmt -check
           docker compose run --rm terraform -chdir=deploy/ validate
