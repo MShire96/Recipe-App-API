@@ -1,0 +1,32 @@
+name: Test and Lint
+
+on:
+  workflow_call: # The trigger is whenever we use it in another workflow
+  # This allows us to create a reusable workflow that can be used in our check and our
+  # Deploy workfile we will use later
+    secrets:
+      DOCKERHUB_USER: # These secrets need to be passed for this to be able to run
+        required: true
+        description: "Username for DockerHub auth"
+      DOCKERHUB_TOKEN:
+        required: true
+        description: "Token for DockerHub auth"
+
+jobs:
+  python: # This is the python job here
+    name: Python # Name of the job we give it
+    runs-on: ubuntu-22.04 # The job will run on this OS
+    steps: 
+      - name: Login to Docker Hub # The first job is to log in to docker
+        uses: docker/login-action@v3 # We're using an existing github action to log in
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Checkout
+        uses: actions/checkout@v4 # Uses checkout actions to checkout the code
+      - name: Test
+        run: docker compose run --rm app sh -c "python manage.py wait_for_db && python manage.py test"
+        # Test for the apps python, wait for db to be up and running and then unit tests for projects
+      - name: Python flake8
+        run: docker compose run --rm app sh -c "flake8"
+        # Flake8 is the linting tool set up for app project

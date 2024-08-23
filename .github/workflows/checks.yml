@@ -1,21 +1,15 @@
----
 name: Checks
 
-on: [push]
+on:
+  pull_request:
+    branches: [main] # When we create a pull request on main 
+    # It will target this workflow
 
+ 
 jobs:
-  test-lint:
-    name: Test and Lint
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USER }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Test
-        run: docker-compose run --rm app sh -c "python manage.py wait_for_db && python manage.py test"
-      - name: Lint
-        run: docker-compose run --rm app sh -c "flake8"
+  test-lint: # ID of the job for the system
+    name: Test and Lint # User-friendly name
+    uses: ./.github/workflows/test-and-lint.yml # Allows us to use this file
+    secrets:
+      DOCKERHUB_USER: ${{ vars.DOCKERHUB_USER }} # This is how we pull environment variables from GitHub
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }} # Easy to pass them into that test and lint file
