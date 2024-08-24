@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy 
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       - prod
 
 jobs:
-  test-lint: #  We will run the linting again here whenever we deploy
+  test-lint: # We will run the linting again here whenever we deploy
     uses: ./.github/workflows/test-and-lint.yml
     name: Test and Lint
     secrets:
@@ -23,13 +23,13 @@ jobs:
         uses: actions/checkout@v4
       - name: Set vars
         run: | # Github ref is an environment variable that is set auto on GitHub
-          if [[ $GITHUB_REF == 'refs/heads/prod' ]]; then 
+          if [[ $GITHUB_REF == 'refs/heads/prod' ]]; then
         # The ref is actually the git reference, which is the long form name of the branch
             echo "prod" > .workspace
         # Creates a new file in the jobs that contains the word prod
         # We use this to switch to the workspace that we've put in the workspace directory 
           else
-            echo "staging" > .workspace
+          echo "staging" > .workspace
           fi
       - name: Push to ECR
         env:
@@ -43,7 +43,7 @@ jobs:
           docker build --compress -t ${{ vars.ECR_REPO_APP }}:$GITHUB_SHA .
           docker push ${{ vars.ECR_REPO_APP }}:$GITHUB_SHA
           # Builds docker image in local directory, 
-          # Speciy tag which needs to match location we need to push to in our ECR.
+          # Specify tag which needs to match location we need to push to in our ECR.
           # Add tag to end, commit sha, commit hash generated for every commit to identify which change for which build
           docker build --compress -t ${{ vars.ECR_REPO_PROXY }}:$GITHUB_SHA proxy/
           docker push ${{ vars.ECR_REPO_PROXY }}:$GITHUB_SHA
