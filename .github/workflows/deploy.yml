@@ -29,7 +29,7 @@ jobs:
         # Creates a new file in the jobs that contains the word prod
         # We use this to switch to the workspace that we've put in the workspace directory 
           else
-          echo "staging" > .workspace
+            echo "staging" > .workspace
           fi
       - name: Push to ECR
         env:
