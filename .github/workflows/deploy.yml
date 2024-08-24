@@ -1,0 +1,50 @@
+name: Deploy
+
+on:
+  push:
+    branches: # This will be triggered on pushes to these branches
+      - main
+      - prod
+
+jobs:
+  test-lint: #  We will run the linting again here whenever we deploy
+    uses: ./.github/workflows/test-and-lint.yml
+    name: Test and Lint
+    secrets:
+      DOCKERHUB_USER: ${{ vars.DOCKERHUB_USER }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-22.04
+    needs: [test-lint]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set vars
+        run: | # Github ref is an environment variable that is set auto on GitHub
+          if [[ $GITHUB_REF == 'refs/heads/prod' ]]; then 
+        # The ref is actually the git reference, which is the long form name of the branch
+            echo "prod" > .workspace
+        # Creates a new file in the jobs that contains the word prod
+        # We use this to switch to the workspace that we've put in the workspace directory 
+          else
+          echo "staging" > .workspace
+          fi
+      - name: Push to ECR
+        env:
+          AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }} # These are pulled form GitHub actions variable config
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+        # Log into docker but authenticate with ECR repo instead of docker
+          # After images are built, the images are pushed to private ecr repo instead of public dockerhub
+          # We would then be logged into docker with aws account
+          docker build --compress -t ${{ vars.ECR_REPO_APP }}:$GITHUB_SHA .
+          docker push ${{ vars.ECR_REPO_APP }}:$GITHUB_SHA
+          # Builds docker image in local directory, 
+          # Speciy tag which needs to match location we need to push to in our ECR.
+          # Add tag to end, commit sha, commit hash generated for every commit to identify which change for which build
+          docker build --compress -t ${{ vars.ECR_REPO_PROXY }}:$GITHUB_SHA proxy/
+          docker push ${{ vars.ECR_REPO_PROXY }}:$GITHUB_SHA
+          # Same build in proxy/ and then use same tag but for proxy
