@@ -12,3 +12,14 @@ variable "contact" {
   description = "Contact email for tagging resources"
   default     = "ms01354g@gmail.com"
 }
+
+variable "db_username" {
+  description = "Username for the recipe app api database"
+  default     = "recipeapp"
+}
+
+variable "db_password" {
+  description = "Password for the Terraform database"
+}
+# This db password is going to be required to be set by environment variables
+# This was previously configured on github actions 
