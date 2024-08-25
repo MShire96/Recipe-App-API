@@ -42,6 +42,10 @@ resource "aws_ecs_cluster" "main" {
   name = "${local.prefix}-cluster"
 }
 
+resource "aws_cloudwatch_log_group" "ecs_task_logs" {
+  name = "${local.prefix}-api"
+}
+
 # All we need to create a new cluster in AWS
 # The cluster we'll be adding our services and our tasks to
 # It'll be the wrapper around the other resources.
