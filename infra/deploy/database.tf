@@ -41,7 +41,7 @@ resource "aws_db_instance" "main" {
   allocated_storage          = 20                            # Storage for RDS instance, GB
   storage_type               = "gp2"                         # General storage, our app designed for it
   engine                     = "postgres"                    # The engine we'll be using
-  engine_version             = "15.3"                        # Version of postgres
+  engine_version             = "15.4"                        # Version of postgres
   auto_minor_version_upgrade = true                          # AWS able to upgrade minor versions of the DB automatically, security fixes etc
   instance_class             = "db.t4g.micro"                # Size of the server running the DB, smallest size
   username                   = var.db_username               # Username
