@@ -151,3 +151,109 @@ resource "aws_subnet" "private_b" {
     Name = "${local.prefix}-private-b"
   }
 }
+
+########################################################################
+# Endpoints to allow ECS to access ECR, Cloudwatch and Systems Manager #
+########################################################################
+
+resource "aws_security_group" "endpoint_access" {
+  description = "Access to endpoints"
+  name        = "${local.prefix}-endpoint-access"
+  vpc_id      = aws_vpc.main.id
+  # Security group for endpoints that so that we can connect to endpoints
+  # Have to have SGs to provision access to endpoint from resources in subnet
+  ingress {                                 # inbound access to what SG is assigned to, inbound acces to endpoint from cidr block
+    cidr_blocks = [aws_vpc.main.cidr_block] # Allow ingress from everywhere in cidr
+    from_port   = 443                       # All these ports use HTTP so 443
+    to_port     = 443
+    protocol    = "tcp" # All http/https uses tcp
+  }
+}
+
+# 
+resource "aws_vpc_endpoint" "ecr" {
+  vpc_id       = aws_vpc.main.id
+  service_name = "com.amazonaws.${data.aws_region.current.name}.ecr.api"
+  # Name of service the endpoint will connect to, listed in endpoint interface in AWS
+  # Connect to ECR from ECS using interface endpoint
+  vpc_endpoint_type = "Interface"
+  # 2 types of endpoints, gateways and interface, gateways only for S3 atm
+  private_dns_enabled = true
+  # we get private dns name for ecs so it can easily resolve the endpoint were trying to connect to
+  subnet_ids = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+
+  security_group_ids = [
+    aws_security_group.endpoint_access.id
+  ]
+
+  tags = {
+    Name = "${local.prefix}-ecr-endpoint"
+  }
+}
+
+# To connect to ECR we need 3 endpoints to make it possible
+# The ECR endpoint service above, docker repo service dkr, and S3 which aws uses to store images
+
+resource "aws_vpc_endpoint" "dkr" {
+  vpc_id              = aws_vpc.main.id
+  service_name        = "com.amazonaws.${data.aws_region.current.name}.ecr.dkr"
+  vpc_endpoint_type   = "Interface"
+  private_dns_enabled = true
+
+  subnet_ids = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+
+  security_group_ids = [
+    aws_security_group.endpoint_access.id
+  ]
+
+  tags = {
+    Name = "${local.prefix}-dkr-endpoint"
+  }
+}
+
+resource "aws_vpc_endpoint" "cloudwatch_logs" {
+  vpc_id              = aws_vpc.main.id
+  service_name        = "com.amazonaws.${data.aws_region.current.name}.logs"
+  vpc_endpoint_type   = "Interface"
+  private_dns_enabled = true
+
+  subnet_ids = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+
+  security_group_ids = [
+    aws_security_group.endpoint_access.id
+  ]
+
+  tags = {
+    Name = "${local.prefix}-cloudwatch-endpoint"
+  }
+}
+
+resource "aws_vpc_endpoint" "ssm" {
+  vpc_id              = aws_vpc.main.id
+  service_name        = "com.amazonaws.${data.aws_region.current.name}.ssmmessages"
+  vpc_endpoint_type   = "Interface"
+  private_dns_enabled = true
+
+  subnet_ids = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+
+  security_group_ids = [
+    aws_security_group.endpoint_access.id
+  ]
+
+  tags = {
+    Name = "${local.prefix}-ssmmessages-endpoint"
+  }
+}
+
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id            = aws_vpc.main.id
+  service_name      = "com.amazonaws.${data.aws_region.current.name}.s3"
+  vpc_endpoint_type = "Gateway"
+  route_table_ids = [
+    aws_vpc.main.default_route_table_id
+  ]
+
+  tags = {
+    Name = "${local.prefix}-s3-endpoint"
+  }
+}
