@@ -60,7 +60,47 @@ resource "aws_ecs_task_definition" "api" {
   execution_role_arn       = aws_iam_role.task_execution_role.arn # ECS allowed to pull images
   task_role_arn            = aws_iam_role.app_task.arn            # role assigned to task, permission for ssm manager
 
-  container_definitions = jsonencode([]) # Definition of containers that are going to the task
+
+  # Definition containers that are going to the task
+
+  container_definitions = jsonencode([
+    {
+      name              = "proxy"             # The proxy is going to receive requests via HTTP, serve the static, and serve rest of request to app
+      image             = var.ecr_proxy_image # Image is pulled from ecr
+      essential         = true                # Container is essential to service, will restart if unhealthy
+      memoryReservation = 256                 # Amount of memory reserved for this task, mustn't exceed 512
+      user              = "nginx"             # Name of the user
+      portMappings = [                        # What maps the network ports from container to the host
+        {
+          containerPort = 8000
+          hostPort      = 8000
+        }
+      ]
+      environment = [ # Enviroment variables set for the container, the host that the app is running on when we run the task
+        {
+          name  = "APP_HOST"
+          value = "127.0.0.1"
+        }
+      ]
+      mountPoints = [ # Where you map the volumes, static
+        {
+          readOnly      = true
+          containerPath = "/vol/static"
+          sourceVolume  = "static"
+        }
+      ]
+      logConfiguration = { # Tells ecs where to store our logs
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.ecs_task_logs.name
+          awslogs-region        = data.aws_region.current.name
+          awslogs-stream-prefix = "proxy"
+        }
+      }
+    }
+  ])
+
+  # Definition of containers that are going to the task
 
   volume {
     name = "static" # The volume available to our ECS task definition, docker volume

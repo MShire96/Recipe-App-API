@@ -23,3 +23,9 @@ variable "db_password" {
 }
 # This db password is going to be required to be set by environment variables
 # This was previously configured on github actions 
+
+variable "ecr_proxy_image" {
+  description = "Path to the ECR repo with the proxy image"
+}
+
+# The variable we will set by environment variables
