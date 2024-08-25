@@ -107,8 +107,8 @@ resource "aws_ecs_task_definition" "api" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group          = aws_cloudwatch_log_group.ecs_task_logs.name
-          awslogs-region         = data.aws_region.current.name
+          awslogs-group         = aws_cloudwatch_log_group.ecs_task_logs.name
+          awslogs-region        = data.aws_region.current.name
           awslogs-stream-prefix = "api"
         }
       }
@@ -205,7 +205,7 @@ resource "aws_ecs_service" "api" {                            # Resource to allo
   enable_execute_command = true    # Allows us to run exec command on our running containers
 
   # Defines the network for our service
-  # Public acces for now for our test, afterwards false because only access from load balancer
+  # Public access for now for our test, afterwards false because only access from load balancer
   network_configuration {
     assign_public_ip = true
 
