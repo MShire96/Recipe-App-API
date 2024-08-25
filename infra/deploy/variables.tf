@@ -29,3 +29,11 @@ variable "ecr_proxy_image" {
 }
 
 # The variable we will set by environment variables
+
+variable "ecr_app_image" {
+  description = "Path to the ECR repo with the API image"
+}
+
+variable "django_secret_key" {
+  description = "Secret key for Django"
+}

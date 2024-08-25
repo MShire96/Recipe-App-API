@@ -65,6 +65,56 @@ resource "aws_ecs_task_definition" "api" {
 
   container_definitions = jsonencode([
     {
+      name              = "api"
+      image             = var.ecr_app_image
+      essential         = true
+      memoryReservation = 256
+      user              = "django-user"
+      environment = [
+        {
+          name  = "DJANGO_SECRET_KEY"
+          value = var.django_secret_key
+
+        },
+        {
+          name  = "DB_HOST" # Host name of the database
+          value = aws_db_instance.main.address
+        },
+        {
+          name  = "DB_NAME" # Name of the database inside postgres django is going to use
+          value = aws_db_instance.main.db_name
+        },
+        {
+          name  = "DB_USER" # Username to authenticate
+          value = aws_db_instance.main.username
+        },
+        {
+          name  = "DB_PASS" # Password to authenticate
+          value = aws_db_instance.main.password
+        },
+        {
+          name  = "ALLOWED_HOSTS" # A list of domain names allowed to make requests
+          value = "*"
+        }
+      ]
+      mountPoints = [
+        {
+          readOnly      = false # Django needs to be able to write files to this location to save static files
+          containerPath = "/vol/web/static"
+          sourceVolume  = "static"
+        }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group          = aws_cloudwatch_log_group.ecs_task_logs.name
+          awslogs-region         = data.aws_region.current.name
+          awslogs-streams-prefix = "api"
+        }
+      }
+    },
+
+    {
       name              = "proxy"             # The proxy is going to receive requests via HTTP, serve the static, and serve rest of request to app
       image             = var.ecr_proxy_image # Image is pulled from ecr
       essential         = true                # Container is essential to service, will restart if unhealthy
