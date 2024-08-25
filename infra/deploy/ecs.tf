@@ -194,3 +194,26 @@ resource "aws_security_group" "ecs_service" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+resource "aws_ecs_service" "api" {                            # Resource to allow us to create an ecs service
+  name                   = "${local.prefix}-api"              # Name of the ecs service 
+  cluster                = aws_ecs_cluster.main.name          # Cluster we're adding service to
+  task_definition        = aws_ecs_task_definition.api.family # Task definition we've defined aboce
+  desired_count          = 1                                  # Number of running instances in our service
+  launch_type            = "FARGATE"
+  platform_version       = "1.4.0" # Versioning system fargate has
+  enable_execute_command = true    # Allows us to run exec command on our running containers
+
+  # Defines the network for our service
+  # Public acces for now for our test, afterwards false because only access from load balancer
+  network_configuration {
+    assign_public_ip = true
+
+    subnets = [
+      aws_subnet.public_a.id,
+      aws_subnet.public_b.id
+    ]
+
+    security_groups = [aws_security_group.ecs_service.id]
+  }
+}
