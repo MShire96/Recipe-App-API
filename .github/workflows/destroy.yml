@@ -1,0 +1,31 @@
+name: Destroy
+
+on: 
+  workflow_dispatch: # Allows us to manually trigger a workflow in the GitHub Interface
+  # Allows us to only run the workflow when we want to
+    inputs:
+      environment: # Allows us to choose which environment to make a change to
+        type: choice
+        description: Which environment to remove AWS resources for?
+        options: # In real project, might want to remove prod since you don't want to remove
+                 # A real prod environment
+          - staging
+          - prod
+
+jobs:
+  destroy:
+    name: Destroy
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Terraform Destroy
+        env:
+          AWS_ACCESS_KEY_KID: ${{ vars.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          export TF_WORKSPACE=${{ github.event.inputs.environment }}
+          cd infra/
+          docker compose run --rm terraform -chdir=deploy/ init
+          docker compose run --rm terraform -chdir=deploy/ destroy -auto-approve
+        # Takes the enviroment input given by the user above and sets it as an env variable TF_WORKSPACE
