@@ -125,3 +125,29 @@ resource "aws_route" "public_internet_access_b" {
 }
 # Create AWS route, connected to route table in public b
 # Access through internet gateway, destination to all IP addresses
+
+############################################
+# Private subnets for internal access only #
+############################################
+
+# Don't need to hook it up with internet gateway
+
+resource "aws_subnet" "private_a" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.1.10.0/24"
+  availability_zone = "${data.aws_region.current.name}a"
+
+  tags = {
+    Name = "${local.prefix}-private-a"
+  }
+}
+
+resource "aws_subnet" "private_b" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.1.11.0/24"
+  availability_zone = "${data.aws_region.current.name}b"
+
+  tags = {
+    Name = "${local.prefix}-private-b"
+  }
+}
