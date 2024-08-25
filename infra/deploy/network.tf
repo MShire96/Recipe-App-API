@@ -257,3 +257,5 @@ resource "aws_vpc_endpoint" "s3" {
     Name = "${local.prefix}-s3-endpoint"
   }
 }
+
+# S3 will store the ECR images behind S3 so we need connect to it aswell
