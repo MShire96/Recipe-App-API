@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 import os
 from pathlib import Path
+from socket import gethostname, gethostbyname # TO GET ECS TASK HOST IP 1/2
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,6 +34,8 @@ ALLOWED_HOSTS.extend(
         os.environ.get('ALLOWED_HOSTS', '').split(','),
     )
 )
+if os.environ.get('AWS_EXECUTION_ENV'): # TO GET ECS HOST IP 2/2
+    ALLOWED_HOSTS.append(gethostbyname(gethostname()))
 
 # Application definition
 
