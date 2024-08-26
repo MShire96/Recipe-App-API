@@ -29,3 +29,9 @@ resource "aws_security_group" "lb" {
   }
 }
 
+resource "aws_lb" "api" { # Actually creating our resource ALB
+  name               = "${local.prefix}-lb"
+  load_balancer_type = "application"
+  subnets            = [aws_subnet.public_a.id, aws_subnet.public_b.id]
+  security_groups    = [aws_security_group.lb.id]
+}
