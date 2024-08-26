@@ -35,3 +35,15 @@ resource "aws_lb" "api" { # Actually creating our resource ALB
   subnets            = [aws_subnet.public_a.id, aws_subnet.public_b.id]
   security_groups    = [aws_security_group.lb.id]
 }
+
+resource "aws_lb_target_group" "api" {
+  name        = "${local.prefix}-api"
+  protocol    = "HTTP" # These requests are going to be forwarded in our request
+  vpc_id      = aws_vpc.main.id
+  target_type = "ip"
+  port        = 8000
+
+  health_check {
+    path = "/api/health-check"
+  }
+}
