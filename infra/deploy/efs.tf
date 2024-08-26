@@ -19,7 +19,7 @@ resource "aws_security_group" "efs" {
     protocol  = "tcp"
 
     security_groups = [ # We want only ecs_service to access our efs file system
-      aws_security_group.ecs_service
+      aws_security_group.ecs_service.id
     ]
   }
 }
