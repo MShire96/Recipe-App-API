@@ -47,3 +47,14 @@ resource "aws_lb_target_group" "api" {
     path = "/api/health-check"
   }
 }
+
+resource "aws_lb_listener" "api" { # Incoming component of the load balancer
+  load_balancer_arn = aws_lb.api.arn
+  port              = 80
+  protocol          = "HTTP" # We can't add HTTPS until later on, when we add custom domain name, to register a certificate
+
+  default_action { # Forward request to our target group
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.api.arn
+  }
+}
