@@ -37,3 +37,20 @@ variable "ecr_app_image" {
 variable "django_secret_key" {
   description = "Secret key for Django"
 }
+
+variable "dns_zone_name" { # When you register a domain in aws, it gives it a zone name
+  description = "Domain name"
+  default     = "mohshire.com"
+}
+
+variable "subdomain" {
+  description = "Subdomain for each environment"
+  type        = map(string)
+
+  default = { # Creating subdomains
+    prod    = "api"
+    staging = "api.staging"
+    dev     = "api.dev"
+  }
+}
+# E.g. api.mohshire.com
