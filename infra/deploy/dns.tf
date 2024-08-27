@@ -3,7 +3,7 @@ data "aws_route53_zone" "zone" { # Used to get data that exists in aws
 }
 
 resource "aws_route53_record" "app" {
-  zone_id = data.aws_route53_zone.zone.id
+  zone_id = data.aws_route53_zone.zone.zone_id
   name    = "${lookup(var.subdomain, terraform.workspace)}.${data.aws_route53_zone.zone.name}"
   type    = "CNAME"
   ttl     = "300"
