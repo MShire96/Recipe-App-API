@@ -93,8 +93,8 @@ resource "aws_ecs_task_definition" "api" {
           value = aws_db_instance.main.password
         },
         {
-          name  = "ALLOWED_HOSTS" # A list of domain names allowed to make requests
-          value = "*"
+          name  = "ALLOWED_HOSTS"             # A list of domain names allowed to make requests
+          value = aws_route53_record.app.fqdn # Set our allowed hosts valued to our custom dns name for this particular environment thats running
         }
       ]
       mountPoints = [
