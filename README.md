@@ -1,13 +1,3 @@
-# DevOps Deployment Automation with Terraform, AWS and Docker - Starter Code
-
-This project contains the starter code for our course: [DevOps Deployment Automation with Terraform, AWS and Docker](https://londonapp.dev/c3).
-
-It contains the code you should have by the end of our [Build a Backend REST API with Python & Django REST Framework - Advanced](https://londonapp.dev/c2) course. We've created this snapshot, in-case we update the aforementioned course in the future.
-
-## Local Development
-
-### Running Project
-
 This project runs using Docker. It should work consistently on Windows, macOS or Linux machines.
 
 Follow the below steps to run a local development environment.
@@ -45,9 +35,8 @@ docker compose down --volumes
 docker compose up
 ```
 
-## Course Documentation
+## Supplementary Documenation
 
-This section contains supplementary documentation for the course steps.
 
 ### AWS CLI
 
@@ -135,25 +124,6 @@ Secrets:
 - `TF_VAR_DB_PASSWORD`: Password for the RDS database (make something up).
 - `TF_VAR_DJANGO_SECRET_KEY`: Secret key for the Django app (make something up).
 
-### GitLab CI/CD Variables
-
-This section lists the GitLab CI/CD variables which must be configured to run jobs.
-
-> Note: This is only applicable if you are using GitLab CI/CD. If you are using GitHub Actions, see [#github-actions-variables](GitHub Actions Variables) above.
-
-In GitLab CI/CD, all variables are set under **Variables**, and optionally set as masked (secrets hidden from output) and/or protected (restricted to protected branches).
-
-Each variable and their state is listed below:
-
-- `AWS_ACCESS_KEY_ID`: Access key for the CD AWS IAM user that is created by Terraform and output as `cd_user_access_key_id`.
-- `AWS_ACCOUNT_ID`: AWS Account ID taken from AWS directly.
-- `DOCKERHUB_USER`: Username for [Docker Hub](https://hub.docker.com/) for avoiding Docker Pull rate limit issues.
-- `ECR_REPO_APP`: URL for the Docker repo containing the app image output by Terraform as `ecr_repo_app`.
-- `ECR_REPO_PROXY`: URL for the Docker repo containing the proxy image output by Terraform as `ecr_repo_proxy`.
-- `AWS_SECRET_ACCESS_KEY` (**Masked**): Secret key for `AWS_ACCESS_KEY_ID` set in variables, output by Terraform as `cd_user_access_key_secret`.
-- `DOCKERHUB_TOKEN` (**Masked**): Token created in `DOCKERHUB_USER` in [Docker Hub](https://hub.docker.com/).
-- `TF_VAR_db_password` (**Masked**): Password for the RDS database (make something up).
-- `TF_VAR_django_secret_key` (**Masked**, **Protected**): Secret key for the Django app (make something up).
 
 ## Section Notes and Resources
 
@@ -199,13 +169,3 @@ git config --global user.name "User Name"
 git config --global push.autoSetupRemote true
 ```
 
-## Other courses
-
-Check out our courses on [londonappdeveloper.com](https://londonappdeveloper.com).
-
-Or find them below:
-
-- [Python for Absolute Beginners](https://londonapp.dev/c4)
-- [Build a Backend REST API with Python & Django REST Framework - Beginner](https://londonapp.dev/c1)
-- [Build a Backend REST API with Python & Django REST Framework - Advanced](https://londonapp.dev/c2)
-- [Deploy a Serverless Django App on Google App Engine](https://londonapp.dev/c5)
